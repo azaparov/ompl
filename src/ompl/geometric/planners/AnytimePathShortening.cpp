@@ -158,9 +158,45 @@ ompl::geometric::AnytimePathShortening::solve(const ompl::base::PlannerTerminati
             if (hsol)
             {
                 auto *pg = static_cast<geometric::PathGeometric *>(hsol.get());
-                double difference = 0.0;
-                bool approximate = !goal->isSatisfied(pg->getStates().back(), &difference);
-                pdef_->addSolutionPath(hsol, approximate, difference);
+
+                printf("!!!!!!\n");
+                bool path_verification = pg->check();
+                if(path_verification == false) {
+                    OMPL_WARN("Hybrid path violates constraints");
+                    printf("Hybrid path violates constraints\n");
+                }  else {
+                    //Verify that path is valie
+                    double difference = 0.0;
+                    bool approximate = !goal->isSatisfied(pg->getStates().back(), &difference);
+                    pdef_->addSolutionPath(hsol, approximate, difference);
+                }
+
+                /*
+                return A pair of boolean values is returned. The first
+                value represents the validity of the path before any
+                change was made. The second value represents the
+                validity of the path after changes were attempted. If
+                no changes are attempted, the both values are true.
+
+                \note If repairing a path fails, the path may still be altered
+                std::pair<bool, bool>
+                */
+                /*
+                auto path_verifictation = pg->check(5);
+                if(path_verifictation.first == false) {
+                    OMPL_WARN("Hybrid path violates constraints");
+                    printf("Hybrid path violates constraints\n");
+                }  else {
+                    if (path_verifictation.second == true) {
+                        //Verify that path is valie
+                        double difference = 0.0;
+                        bool approximate = !goal->isSatisfied(pg->getStates().back(), &difference);
+                        pdef_->addSolutionPath(hsol, approximate, difference);
+                    } else {
+                        OMPL_WARN("rejecting hybrid path");
+                    }
+                }
+                 */
             }
         }
 
